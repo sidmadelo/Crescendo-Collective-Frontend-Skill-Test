@@ -1,43 +1,56 @@
 import React, { Component } from 'react';
-import { CircularProgress, Grid, Box} from '@material-ui/core';
-import { withStyles } from '@material-ui/core/styles';
+import { CircularProgress, Grid, Box, Button} from '@material-ui/core';
+import PlusIcon from '@material-ui/icons/AddBox';
 
+import CreateDialog from './components/CreateRecipeDialog';
 import RecipeCard from './components/RecipeCard';
-import api from '../../utils/api';
-
-const useStyles = theme => ({
-    root: {
-       flexGrow: 1,
-    },
-});
+import { WithRecipesContext } from '../../context/RecipeContext';
 
 class Recipes extends Component {
 
     state = {
-        recipes: [],
-        isLoading: true,
+        open: false
     }
 
-    getRecipes = async () => {
-        const { data } = await api.get('recipes');
-        this.setState({
-            recipes: data,
-            isLoading: false
-        })
-    } 
-
     componentDidMount() {
-        this.getRecipes();
+        this.props.actions.getRecipesFromApi();
     }
 
     render() {
-        const { classes } = this.props;
+        const { isLoading, recipes } = this.props.state
+
+        const handleClickOpen = () => {
+            this.setState({
+                open: true
+            });
+        };
+
+        const handleClose = () => {
+            this.setState({
+                open: false
+            });
+        };
 
         return(
             <Box p={2}>
-                <Grid container className={classes.root} spacing={3}>
-                    {this.state.isLoading ? <CircularProgress /> :
-                        this.state.recipes.map( recipe => (
+                <CreateDialog 
+                    open={this.state.open}
+                    handleClose={handleClose}
+                />
+                <Box py={2}>
+                    <Button
+                        variant="contained"
+                        color="secondary"
+                        startIcon={<PlusIcon />}
+                        onClick={handleClickOpen}
+                    >
+                        recipe
+                    </Button>
+                </Box>
+
+                <Grid container spacing={3}>
+                    {isLoading ? <CircularProgress /> :
+                        recipes.map( recipe => (
                             <Grid item key={recipe.uuid}>
                                 <RecipeCard recipe={recipe}/>
                             </Grid>
@@ -50,4 +63,5 @@ class Recipes extends Component {
     }
 }
 
-export default withStyles(useStyles)(Recipes)
+
+export default WithRecipesContext(Recipes)

@@ -38,6 +38,16 @@ const useStyles = makeStyles((theme) => ({
 const RecipeCard = props => {
     const classes = useStyles();
 
+    const ImageContainer = () => {
+        return !props.recipe.images.medium ? null :
+            <CardMedia
+                component={Link}
+                to={`recipes/${props.recipe.uuid}`}
+                className={classes.media}
+                image={`${process.env.REACT_APP_API_URL}/${props.recipe.images.medium}`}
+            />
+        }
+
     return (
         <Card className={classes.root}>
             <CardHeader
@@ -47,12 +57,7 @@ const RecipeCard = props => {
                 title={props.recipe.title}
             />
 
-            <CardMedia
-                component={Link}
-                to={`recipes/${props.recipe.uuid}`}
-                className={classes.media}
-                image={`http://localhost:3001/${props.recipe.images.medium}`}
-            />
+            <ImageContainer />
 
             <CardContent>
                 <Typography noWrap variant="body2" color="textSecondary" component="p">
